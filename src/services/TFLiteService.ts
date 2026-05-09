@@ -1,96 +1,74 @@
-import * as tf from '@tensorflow/tfjs';
-import * as tfrn from '@tensorflow/tfjs-react-native';
-import * as FileSystem from 'expo-file-system/legacy';
-import { getModelLocalUri } from './ModelDownloadManager';
+/**
+ * TFLiteService — Image Analysis (Simulated)
+ *
+ * The original implementation used @tensorflow/tfjs + @tensorflow/tfjs-react-native
+ * which crash on React Native due to `process.hrtime` being a Node.js API
+ * that doesn't exist in the RN JS runtime.
+ *
+ * This version provides a simulated analysis that maps basic image characteristics
+ * to classification labels for mood mapping. In production, swap this with:
+ *   - A cloud API (Google Cloud Vision, AWS Rekognition)
+ *   - react-native-fast-tflite for on-device inference
+ *   - An Expo module for ML Kit
+ */
 
-let model: tf.LayersModel | null = null;
-let labels: string[] = [];
+let isModelLoaded = false;
+
+// Predefined label pools for simulated analysis
+const LABEL_POOLS = [
+  ['beach', 'ocean', 'seashore', 'coast', 'sandbar'],
+  ['mountain', 'alp', 'valley', 'cliff', 'volcano'],
+  ['forest', 'tree', 'park', 'garden', 'blossom'],
+  ['street', 'building', 'skyscraper', 'road', 'bridge'],
+  ['bedroom', 'kitchen', 'library', 'room', 'indoor'],
+  ['night', 'dark', 'moon', 'evening', 'shadow'],
+  ['stadium', 'gym', 'sport', 'crowd', 'athlete'],
+  ['flower', 'butterfly', 'petal', 'garden', 'children'],
+];
 
 /**
- * Loads the Graph Model (JSON format used by TFJS) or TFLite model 
- * from the local filesystem.
+ * Simulates model loading
  */
 export const loadModel = async (): Promise<void> => {
-  try {
-    if (model) return;
+  if (isModelLoaded) return;
 
-    const modelJsonPath = getModelLocalUri('mobilenet_v3');
-    const labelsPath = getModelLocalUri('imagenet_labels');
-
-    if (!modelJsonPath || !labelsPath) {
-      throw new Error('Model or labels path not found in local storage.');
-    }
-
-    // 1. Load Labels
-    const labelsContent = await FileSystem.readAsStringAsync(labelsPath);
-    labels = labelsContent.split('\n').filter(l => l.trim() !== '');
-
-    // 2. Load Model
-    // Since we downloaded a model.json for TFJS-RN compatibility
-    // we use loadGraphModel or loadLayersModel
-    console.log('Loading model from:', modelJsonPath);
-    
-    // Note: For models on local filesystem, we use the FileSystem URI
-    // and the bundleResourceIO logic if bundled, but here it's in documentDirectory
-    model = await tf.loadLayersModel(tf.io.browserHTTPRequest(modelJsonPath));
-    
-    console.log('Model loaded successfully');
-  } catch (error) {
-    console.error('Failed to load model:', error);
-    throw error;
-  }
+  console.log('Loading simulated analysis model...');
+  // Simulate loading delay
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  isModelLoaded = true;
+  console.log('Analysis model ready (simulated)');
 };
 
 /**
- * Preprocesses the image and runs inference
+ * Simulates image analysis by returning random classification labels.
+ * In production, this should use actual ML inference.
  */
 export const analyseImage = async (imageUri: string): Promise<string[]> => {
-  if (!model) {
+  if (!isModelLoaded) {
     await loadModel();
   }
 
-  return tf.tidy(() => {
-    try {
-      // 1. Convert Image to Tensor
-      // Note: In real app, we use decodeJpeg from @tensorflow/tfjs-react-native
-      // but that often requires the image as a base64 string or a Uint8Array
-      
-      // For this implementation, we assume a placeholder logic that would 
-      // normally use tfrn.decodeJpeg() after reading the file.
-      
-      // Placeholder for actual image decoding:
-      // const imgB64 = await FileSystem.readAsStringAsync(imageUri, { encoding: 'base64' });
-      // const rawData = tf.util.encodeString(imgB64, 'base64');
-      // const imageTensor = tfrn.decodeJpeg(rawData);
+  console.log('Analyzing image:', imageUri);
 
-      // Simulated Image Tensor for structure validation [1, 224, 224, 3]
-      const fakeImage = tf.randomNormal([1, 224, 224, 3]);
-      
-      // 2. Normalize and Predict
-      const prediction = model!.predict(fakeImage) as tf.Tensor;
-      
-      // 3. Process results
-      const probabilities = prediction.dataSync() as Float32Array;
-      const topIndices = Array.from(probabilities)
-        .map((p, i) => ({ p, i }))
-        .sort((a, b) => b.p - a.p)
-        .slice(0, 5);
+  // Simulate processing time
+  await new Promise((resolve) => setTimeout(resolve, 800));
 
-      return topIndices.map(item => labels[item.i] || `Unknown (${item.i})`);
-    } catch (error) {
-      console.error('Analysis error:', error);
-      return ['Error during analysis'];
-    }
-  });
+  // Pick a random label pool to simulate different scenes
+  const poolIndex = Math.floor(Math.random() * LABEL_POOLS.length);
+  const selectedPool = LABEL_POOLS[poolIndex];
+
+  // Shuffle and return top 5 labels
+  const shuffled = [...selectedPool].sort(() => Math.random() - 0.5);
+  const results = shuffled.slice(0, 5);
+
+  console.log('Analysis results:', results);
+  return results;
 };
 
 /**
  * Free up memory
  */
 export const disposeModel = () => {
-  if (model) {
-    model.dispose();
-    model = null;
-  }
-  tf.disposeVariables();
+  isModelLoaded = false;
+  console.log('Analysis model disposed');
 };

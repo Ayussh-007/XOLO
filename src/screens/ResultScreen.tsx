@@ -22,7 +22,6 @@ import { useAppStore } from '../store/useAppStore';
 import * as TFLiteService from '../services/TFLiteService';
 import * as MoodMapper from '../services/MoodMapper';
 import * as MagentaService from '../services/MagentaService';
-import { getModelLocalUri } from '../services/ModelDownloadManager';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
@@ -79,13 +78,8 @@ export default function ResultScreen({ route, navigation }: Props) {
       setIsGenerating(true);
       setStatus(`Detected ${params.moodLabel} mood. Generating music...`);
 
-      // 4. Music Generation (Magenta)
-      const checkpointPath = getModelLocalUri('magenta_rnn');
-      if (checkpointPath) {
-        // Ensure Magenta is initialized (usually directory path for config/weights)
-        const checkpointDir = checkpointPath.substring(0, checkpointPath.lastIndexOf('/') + 1);
-        await MagentaService.initMagenta(checkpointDir);
-      }
+      // 4. Music Generation
+      await MagentaService.initMagenta();
       
       const sequence = await MagentaService.generateMusic(params);
       
