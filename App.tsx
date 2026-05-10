@@ -9,9 +9,12 @@ import { DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans'
 
 import { useTFSetup } from './src/hooks/useTFSetup';
 import { RootStackParamList } from './src/navigation/types';
-import { colors, fonts, spacing } from './src/theme/theme';
+import { colors, lightColors, fonts, spacing } from './src/theme/theme';
+import { useThemeStore } from './src/store/useThemeStore';
 
-// Screens
+import WelcomeScreen from './src/screens/WelcomeScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import SignupScreen from './src/screens/SignupScreen';
 import SplashDownloadScreen from './src/screens/SplashDownloadScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import CameraScreen from './src/screens/CameraScreen';
@@ -20,23 +23,10 @@ import HistoryScreen from './src/screens/HistoryScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-/** Dark navigation theme matching our design tokens */
-const DarkNavTheme = {
-  ...DefaultTheme,
-  dark: true,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: colors.accentTeal,
-    background: colors.background,
-    card: colors.surface,
-    text: colors.textPrimary,
-    border: colors.borderSubtle,
-    notification: colors.accentAmber,
-  },
-};
-
 export default function App() {
   const { isReady: engineReady, error: engineError } = useTFSetup();
+  const { theme } = useThemeStore();
+  const activeColors = theme === 'dark' ? colors : lightColors;
 
   const [fontsLoaded] = useFonts({
     Syne_700Bold,
@@ -47,29 +37,46 @@ export default function App() {
   // Wait for both engine and fonts
   if (!engineReady || !fontsLoaded) {
     return (
-      <View style={styles.loadingContainer}>
-        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      <View style={[styles.loadingContainer, { backgroundColor: activeColors.background }]}>
+        <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} translucent backgroundColor="transparent" />
         <PulsingLoader />
-        <Text style={styles.loadingText}>Initializing...</Text>
+        <Text style={[styles.loadingText, { color: activeColors.textMuted }]}>Initializing...</Text>
         {engineError && (
-          <Text style={styles.errorText}>{engineError}</Text>
+          <Text style={[styles.errorText, { color: activeColors.error }]}>{engineError}</Text>
         )}
       </View>
     );
   }
 
+  const navTheme = {
+    ...DefaultTheme,
+    dark: theme === 'dark',
+    colors: {
+      ...DefaultTheme.colors,
+      primary: activeColors.accentTeal,
+      background: activeColors.background,
+      card: activeColors.surface,
+      text: activeColors.textPrimary,
+      border: activeColors.borderSubtle,
+      notification: activeColors.accentAmber,
+    },
+  };
+
   return (
     <SafeAreaProvider>
-      <NavigationContainer theme={DarkNavTheme}>
-        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      <NavigationContainer theme={navTheme}>
+        <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} translucent backgroundColor="transparent" />
         <Stack.Navigator
-          initialRouteName="Splash"
+          initialRouteName="Welcome"
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
+            contentStyle: { backgroundColor: activeColors.background },
             animation: 'fade_from_bottom',
           }}
         >
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="Splash" component={SplashDownloadScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Camera" component={CameraScreen} />

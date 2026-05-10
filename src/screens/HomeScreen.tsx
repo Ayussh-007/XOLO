@@ -14,12 +14,17 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
-import { colors, fonts, spacing } from '../theme/theme';
+import { fonts, spacing } from '../theme/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
+import { useThemeStore } from '../store/useThemeStore';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }: Props) {
+  const activeColors = useThemeColors();
+  const { theme, toggleTheme } = useThemeStore();
+  
   // Animated floating blobs
   const blob1X = useRef(new Animated.Value(0)).current;
   const blob1Y = useRef(new Animated.Value(0)).current;
@@ -117,8 +122,8 @@ export default function HomeScreen({ navigation }: Props) {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+    <View style={[styles.container, { backgroundColor: activeColors.background }]}>
+      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} translucent backgroundColor="transparent" />
 
       {/* Animated gradient blobs */}
       <Animated.View
@@ -130,7 +135,7 @@ export default function HomeScreen({ navigation }: Props) {
         ]}
       >
         <LinearGradient
-          colors={[colors.accentTeal, 'transparent']}
+          colors={[activeColors.accentTeal, 'transparent']}
           style={styles.blob1}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
@@ -146,7 +151,7 @@ export default function HomeScreen({ navigation }: Props) {
         ]}
       >
         <LinearGradient
-          colors={[colors.accentAmber, 'transparent']}
+          colors={[activeColors.accentAmber, 'transparent']}
           style={styles.blob2}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
@@ -154,57 +159,83 @@ export default function HomeScreen({ navigation }: Props) {
       </Animated.View>
 
       <SafeAreaView style={styles.safeArea}>
-        <Animated.View style={[styles.content, { opacity: fadeIn }]}>
-          {/* Small logo */}
-          <View style={styles.logoRow}>
-            <Ionicons name="camera" size={18} color={colors.accentTeal} />
-            <MaterialCommunityIcons
-              name="waveform"
-              size={20}
-              color={colors.accentTeal}
-              style={{ marginLeft: 2 }}
-            />
+        <Animated.View style={[styles.containerAnimated, { opacity: fadeIn }]}>
+          {/* Header row with logo, theme toggle, and logout */}
+          <View style={styles.headerRow}>
+            <View style={styles.logoRow}>
+              <Ionicons name="camera" size={18} color={activeColors.accentTeal} />
+              <MaterialCommunityIcons
+                name="waveform"
+                size={20}
+                color={activeColors.accentTeal}
+                style={{ marginLeft: 2 }}
+              />
+            </View>
+            <View style={styles.headerActions}>
+              <Pressable
+                onPress={toggleTheme}
+                style={[styles.headerButton, { backgroundColor: activeColors.surfaceElevated, borderColor: activeColors.borderSubtle }]}
+              >
+                <Ionicons
+                  name={theme === 'dark' ? 'moon' : 'sunny'}
+                  size={18}
+                  color={activeColors.textPrimary}
+                />
+              </Pressable>
+              <Pressable
+                onPress={() => navigation.replace('Welcome')}
+                style={[styles.headerButton, { backgroundColor: activeColors.surfaceElevated, borderColor: activeColors.borderSubtle, marginLeft: spacing.sm }]}
+              >
+                <Ionicons
+                  name="log-out-outline"
+                  size={18}
+                  color={activeColors.error}
+                />
+              </Pressable>
+            </View>
           </View>
 
-          {/* Headline */}
-          <Text style={styles.headline}>
-            What does{'\n'}it sound like?
-          </Text>
+          <View style={styles.centerContent}>
+            {/* Headline */}
+            <Text style={[styles.headline, { color: activeColors.textPrimary }]}>
+              What does{'\n'}it sound like?
+            </Text>
 
-          {/* Buttons */}
-          <View style={styles.buttonGroup}>
-            <PrimaryButton
-              label="Take a Photo"
-              onPress={() => navigation.navigate('Camera', { mode: 'camera' })}
-              shimmer
-              icon={
-                <Ionicons name="camera" size={20} color={colors.black} />
-              }
-            />
+            {/* Buttons */}
+            <View style={styles.buttonGroup}>
+              <PrimaryButton
+                label="Take a Photo"
+                onPress={() => navigation.navigate('Camera', { mode: 'camera' })}
+                shimmer
+                icon={
+                  <Ionicons name="camera" size={20} color={activeColors.black} />
+                }
+              />
 
-            <SecondaryButton
-              label="From Gallery"
-              onPress={() => navigation.navigate('Camera', { mode: 'gallery' })}
-              icon={
-                <Ionicons name="images" size={18} color={colors.accentTeal} />
-              }
-              style={{ marginTop: spacing.base }}
-            />
+              <SecondaryButton
+                label="From Gallery"
+                onPress={() => navigation.navigate('Camera', { mode: 'gallery' })}
+                icon={
+                  <Ionicons name="images" size={18} color={activeColors.accentTeal} />
+                }
+                style={{ marginTop: spacing.base }}
+              />
+            </View>
+
+            {/* History link */}
+            <Pressable
+              onPress={() => navigation.navigate('History')}
+              style={styles.historyLink}
+            >
+              <Ionicons
+                name="time-outline"
+                size={16}
+                color={activeColors.textSecondary}
+                style={{ marginRight: spacing.xs }}
+              />
+              <Text style={[styles.historyText, { color: activeColors.textSecondary }]}>History</Text>
+            </Pressable>
           </View>
-
-          {/* History link */}
-          <Pressable
-            onPress={() => navigation.navigate('History')}
-            style={styles.historyLink}
-          >
-            <Ionicons
-              name="time-outline"
-              size={16}
-              color={colors.textSecondary}
-              style={{ marginRight: spacing.xs }}
-            />
-            <Text style={styles.historyText}>History</Text>
-          </Pressable>
         </Animated.View>
       </SafeAreaView>
     </View>
@@ -214,7 +245,6 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   safeArea: {
     flex: 1,
@@ -223,6 +253,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: spacing.xl,
+  },
+  containerAnimated: {
+    flex: 1,
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+    paddingBottom: 40,
   },
   blobContainer: {
     position: 'absolute',
@@ -246,15 +285,33 @@ const styles = StyleSheet.create({
     borderRadius: width * 0.3,
     opacity: 0.1,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.base,
+    zIndex: 10,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.lg,
   },
   headline: {
     fontFamily: fonts.displayBold,
     fontSize: 38,
-    color: colors.textPrimary,
     lineHeight: 48,
     letterSpacing: -0.5,
     marginBottom: spacing.xxl,
@@ -272,7 +329,6 @@ const styles = StyleSheet.create({
   historyText: {
     fontFamily: fonts.bodyRegular,
     fontSize: 14,
-    color: colors.textSecondary,
     letterSpacing: 0.3,
   },
 });

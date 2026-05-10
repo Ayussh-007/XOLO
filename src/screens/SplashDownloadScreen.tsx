@@ -151,7 +151,7 @@ export default function SplashDownloadScreen({ navigation }: Props) {
         </Animated.View>
 
         {/* App name */}
-        <Text style={styles.appName}>PhotoMusic</Text>
+        <Text style={styles.appName}>XOLO</Text>
         <Text style={styles.tagline}>Your world, in sound.</Text>
       </Animated.View>
 
