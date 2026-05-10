@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../navigation/types';
 import { useAppStore } from '../../store/useAppStore';
 import theme from '../../theme/theme';
@@ -81,10 +82,18 @@ const MoodSelectionScreen: React.FC<Props> = ({ navigation, route }) => {
                 <Text style={styles.moodDesc}>{match.description || 'AI composition generated.'}</Text>
                 
                 <View style={styles.dnaFooter}>
-                  <Text style={styles.dnaText}>
-                    {match.dna?.key || 'C'} {(match.dna?.scale || 'major').replace('_', ' ')}
-                  </Text>
-                  <Text style={styles.dnaText}>{match.dna?.bpm || 80} BPM</Text>
+                  <View style={styles.dnaBadge}>
+                    <Ionicons name="musical-note" size={12} color={match.dna?.color || theme.colors?.accentTeal || '#00D4B1'} />
+                    <Text style={[styles.dnaBadgeText, { color: match.dna?.color || theme.colors?.accentTeal || '#00D4B1' }]}>
+                      {match.dna?.key || 'C'} {(match.dna?.scale || 'major').replace('_', ' ')}
+                    </Text>
+                  </View>
+                  <View style={styles.dnaBadge}>
+                    <Ionicons name="pulse" size={12} color="#AAA" />
+                    <Text style={[styles.dnaBadgeText, { color: '#AAA' }]}>
+                      {match.dna?.bpm || 80} BPM
+                    </Text>
+                  </View>
                 </View>
               </LinearGradient>
             </TouchableOpacity>
@@ -111,8 +120,9 @@ const styles = StyleSheet.create({
   dot: { width: 8, height: 8, borderRadius: 4 },
   moodLabel: { fontSize: 24, fontFamily: theme.fonts?.heading || 'System', color: '#FFF', marginBottom: 8 },
   moodDesc: { fontSize: 14, fontFamily: theme.fonts?.body || 'System', color: '#AAA', marginBottom: 20, lineHeight: 20 },
-  dnaFooter: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)', paddingTop: 16 },
-  dnaText: { fontSize: 12, fontFamily: theme.fonts?.body || 'System', color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
+  dnaFooter: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  dnaBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 100, gap: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  dnaBadgeText: { fontSize: 10, fontFamily: theme.fonts?.heading || 'System', letterSpacing: 1, textTransform: 'uppercase' },
   backLink: { marginTop: 24, padding: 12 },
 });
 

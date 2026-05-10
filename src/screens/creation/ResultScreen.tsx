@@ -13,6 +13,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { RootStackParamList } from '../../navigation/types';
 import { useAppStore } from '../../store/useAppStore';
@@ -48,6 +49,23 @@ export default function ResultScreen({ route, navigation }: Props) {
       if (matches && matches.length > 0) {
         setMatches(matches);
         setStatus('Analysis complete');
+
+        // Save to history
+        try {
+          const newEntry = {
+            id: Date.now().toString(),
+            imageUri: imageUri,
+            moodLabel: matches[0].label || 'Analyzed Photo',
+            createdAt: new Date().toISOString(),
+          };
+          const existing = await AsyncStorage.getItem('photomusic_history');
+          const historyArray = existing ? JSON.parse(existing) : [];
+          historyArray.unshift(newEntry);
+          await AsyncStorage.setItem('photomusic_history', JSON.stringify(historyArray));
+        } catch (e) {
+          console.error('Failed to save history', e);
+        }
+
         navigation.navigate('MoodSelection', { imageUri });
       }
     } catch (error: any) {

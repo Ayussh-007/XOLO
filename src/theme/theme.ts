@@ -82,5 +82,13 @@ export const theme = {
   radius: createSafeObject(radius, 8),
 };
 
+export const getMoodColor = (mood: string) => {
+  const normalized = mood.toLowerCase();
+  if (normalized.includes('happy') || normalized.includes('energetic')) return colors.accentAmber;
+  if (normalized.includes('calm') || normalized.includes('chill') || normalized.includes('focus')) return colors.accentTeal;
+  if (normalized.includes('sad') || normalized.includes('dark') || normalized.includes('mysterious')) return colors.accentPurple;
+  return colors.primary;
+};
+
 export { fonts, spacing, radius };
 export default theme;

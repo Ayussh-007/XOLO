@@ -33,6 +33,17 @@ const KEY_BASE: Record<string, number> = {
   'Ab': 68, 'A': 69, 'A#': 70, 'Bb': 70, 'B': 71,
 };
 
+const INSTRUMENT_URLS: Record<string, string> = {
+  piano: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_1.mp3',
+  synth: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_2.mp3',
+  strings: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_3.mp3',
+  guitar: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_3.mp3',
+  bass: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3',
+  drums: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-2.mp3',
+  pad: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-3.mp3',
+  default: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_1.mp3',
+};
+
 const PerformanceScreen = () => {
   const { selectedMatch } = useAppStore();
   const [isAutomate, setIsAutomate] = useState(false);
@@ -49,17 +60,16 @@ const PerformanceScreen = () => {
     return () => {
       isMounted.current = false;
       stopAutoPlay();
-      Audio.setIsEnabledAsync(false).catch(() => {}); // Safely release audio resources
     };
   }, []);
 
   const setupAudio = async () => {
     try {
+      await Audio.setIsEnabledAsync(true);
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
-        shouldRouteThroughEarpieceAndroid: false,
-        playThroughEarpieceAndroid: false, // Fix for some Android devices
+        playThroughEarpieceAndroid: false, 
       });
     } catch (error) {
       console.error('Audio setup failed:', error);
@@ -81,8 +91,36 @@ const PerformanceScreen = () => {
       if (isMounted.current) setActivePad(null);
     }, 200);
 
-    // Prototype note trigger
-    console.log(`🎵 Trigger: Note ${getNotePitch(index)} (${dna?.instrument})`);
+    const pitch = getNotePitch(index);
+    // console.log(`🎵 Trigger: Note ${pitch} (${dna?.instrument})`);
+
+    try {
+      // Calculate playback rate to pitch-shift the audio. Base pitch = 60 (Middle C).
+      // Math.pow(2, steps/12) gives the frequency ratio.
+      const rate = Math.pow(2, (pitch - 60) / 12);
+      
+      // Determine the audio URL based on the mood's assigned instrument
+      const instrumentType = (dna?.instrument || 'default').toLowerCase();
+      const soundUrl = INSTRUMENT_URLS[instrumentType] || INSTRUMENT_URLS.default;
+
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: soundUrl },
+        { 
+          shouldPlay: true,
+          rate: Math.max(0.2, Math.min(rate, 4.0)), 
+          shouldCorrectPitch: false, // Disabling pitch correction creates the musical note pitch shifting!
+        }
+      );
+      
+      // Free up memory automatically after the short sound plays
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
+    } catch (error) {
+      console.log('Audio trigger error:', error);
+    }
   };
 
   const startAutoPlay = () => {
