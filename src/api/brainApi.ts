@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system/legacy'; // Switching to legacy import as per error message
+import * as FileSystem from 'expo-file-system/legacy';
 import { useAppStore } from '../store/useAppStore';
 
 export interface MoodDNA {
@@ -21,16 +21,16 @@ export interface MoodMatch {
  * Sanitizes and validates the Brain's response to prevent "undefined" errors.
  */
 const sanitizeMatch = (raw: any, index: number): MoodMatch => ({
-  id: raw.id || `match_${index}`,
-  label: raw.label || 'Unknown Vibe',
-  description: raw.description || 'No description available.',
-  confidence: raw.confidence || 0,
+  id: String(raw?.id || `match_${index}`),
+  label: String(raw?.label || 'Unknown Vibe'),
+  description: String(raw?.description || 'No description available.'),
+  confidence: Number(raw?.confidence || 0),
   dna: {
-    scale: raw.dna?.scale || 'major',
-    key: raw.dna?.key || 'C',
-    bpm: raw.dna?.bpm || 80,
-    instrument: raw.dna?.instrument || 'piano',
-    color: raw.dna?.color || '#00D4B1',
+    scale: String(raw?.dna?.scale || 'major'),
+    key: String(raw?.dna?.key || 'C'),
+    bpm: Number(raw?.dna?.bpm || 80),
+    instrument: String(raw?.dna?.instrument || 'piano'),
+    color: String(raw?.dna?.color || '#00D4B1'),
   }
 });
 
@@ -41,32 +41,45 @@ export const analyzeImageWithLaptop = async (imageUri: string): Promise<MoodMatc
     throw new Error('Please set your Laptop IP on the Home screen first.');
   }
 
+  // Ensure URI is properly formatted for FileSystem
+  const cleanUri = imageUri.startsWith('file://') ? imageUri : `file://${imageUri}`;
   const serverUrl = `http://${serverIp.trim()}:8000/analyze`;
   
   try {
-    // Accessing the UploadType from the legacy namespace
-    const uploadType = (FileSystem as any).FileSystemUploadType?.BINARY_CONTENT ?? 1;
+    // Standardize access to the UploadType enum
+    const uploadType = (FileSystem as any).FileSystemUploadType?.BINARY_CONTENT ?? 
+                       (FileSystem as any).UploadType?.BINARY_CONTENT ?? 1;
 
-    const response = await FileSystem.uploadAsync(serverUrl, imageUri, {
+    const response = await FileSystem.uploadAsync(serverUrl, cleanUri, {
       fieldName: 'file',
       httpMethod: 'POST',
       uploadType: uploadType,
     });
 
-    if (response.status !== 200) {
-      throw new Error(`Brain is offline or error occurred (${response.status})`);
+    if (!response || response.status !== 200) {
+      const statusMsg = response ? `Status: ${response.status}` : 'No response from server';
+      throw new Error(`Brain is offline or unreachable. ${statusMsg}`);
     }
 
-    const data = JSON.parse(response.body);
+    let data;
+    try {
+      data = JSON.parse(response.body);
+    } catch (parseError) {
+      throw new Error('Brain returned a non-JSON response. Ensure the Python server is running the correct script.');
+    }
     
     if (!data || !Array.isArray(data.matches)) {
-      throw new Error('Brain returned invalid data format.');
+      throw new Error('Brain returned an unexpected data format (missing "matches" array).');
     }
 
     return data.matches.map((m: any, i: number) => sanitizeMatch(m, i));
     
   } catch (error: any) {
     console.error('AI Brain Error:', error.message);
-    throw new Error('Could not reach the AI Brain. Ensure the Python server is running.');
+    // Categorize the error for the user
+    if (error.message.includes('Network request failed') || error.message.includes('timeout')) {
+      throw new Error('Connection timed out. Check if your phone and laptop are on the same Wi-Fi.');
+    }
+    throw error;
   }
 };

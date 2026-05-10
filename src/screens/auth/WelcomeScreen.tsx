@@ -21,14 +21,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
 const SLIDES = [
   { id: '1', title: 'Capture the Moment', description: 'Snap a photo or choose from gallery.', icon: 'camera-outline' },
-  { id: '2', title: 'AI Sound Engine', description: 'CLIP analyzes the mood of your image.', icon: 'pulse' }, // CHANGED ICON NAME
+  { id: '2', title: 'AI Sound Engine', description: 'CLIP analyzes the mood of your image.', icon: 'pulse' },
   { id: '3', title: 'Hear the World', description: 'Perform unique tracks on a smart instrument.', icon: 'waveform' },
 ];
 
 export default function WelcomeScreen({ navigation }: Props) {
   const { theme: themeMode, toggleTheme } = useThemeStore();
   const activeColors = themeMode === 'dark' ? darkColors : lightColors;
-  const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
 
   const renderItem = ({ item }: { item: typeof SLIDES[0] }) => (
@@ -64,6 +63,9 @@ export default function WelcomeScreen({ navigation }: Props) {
           showsHorizontalScrollIndicator={false}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
           keyExtractor={(item) => item.id}
+          removeClippedSubviews={true} // Performance optimization
+          initialNumToRender={1}
+          maxToRenderPerBatch={1}
         />
       </View>
 
@@ -94,20 +96,20 @@ export default function WelcomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 60 },
-  appName: { fontFamily: theme.fonts.displayBold, fontSize: 24 },
+  appName: { fontFamily: theme.fonts?.displayBold || 'System', fontSize: 24 },
   themeToggle: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   carouselContainer: { flex: 1, justifyContent: 'center' },
   slide: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
   iconContainer: { width: 140, height: 140, borderRadius: 70, borderWidth: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 32 },
-  title: { fontFamily: theme.fonts.displayBold, fontSize: 28, textAlign: 'center', marginBottom: 8 },
-  description: { fontFamily: theme.fonts.bodyRegular, fontSize: 16, textAlign: 'center', lineHeight: 24 },
+  title: { fontFamily: theme.fonts?.displayBold || 'System', fontSize: 28, textAlign: 'center', marginBottom: 8 },
+  description: { fontFamily: theme.fonts?.bodyRegular || 'System', fontSize: 16, textAlign: 'center', lineHeight: 24 },
   pagination: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 48 },
   dot: { height: 8, borderRadius: 4, marginHorizontal: 4 },
   bottomSection: { paddingHorizontal: 24, paddingBottom: 48, gap: 16 },
   primaryButton: { width: '100%', height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  primaryButtonText: { fontFamily: theme.fonts.bodyMedium, fontSize: 16, color: '#080C14' },
+  primaryButtonText: { fontFamily: theme.fonts?.bodyMedium || 'System', fontSize: 16, color: '#080C14' },
   secondaryButton: { width: '100%', height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  secondaryButtonText: { fontFamily: theme.fonts.bodyMedium, fontSize: 16 },
+  secondaryButtonText: { fontFamily: theme.fonts?.bodyMedium || 'System', fontSize: 16 },
   skipButton: { alignItems: 'center', marginTop: 8 },
-  skipText: { fontFamily: theme.fonts.bodyRegular, fontSize: 14 },
+  skipText: { fontFamily: theme.fonts?.bodyRegular || 'System', fontSize: 14 },
 });
