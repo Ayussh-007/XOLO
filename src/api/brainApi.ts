@@ -46,14 +46,12 @@ export const analyzeImageWithLaptop = async (imageUri: string): Promise<MoodMatc
   const serverUrl = `http://${serverIp.trim()}:8000/analyze`;
   
   try {
-    // Standardize access to the UploadType enum
-    const uploadType = (FileSystem as any).FileSystemUploadType?.BINARY_CONTENT ?? 
-                       (FileSystem as any).UploadType?.BINARY_CONTENT ?? 1;
-
+    // uploadType 1 = MULTIPART (required for FastAPI's UploadFile)
     const response = await FileSystem.uploadAsync(serverUrl, cleanUri, {
       fieldName: 'file',
       httpMethod: 'POST',
-      uploadType: uploadType,
+      uploadType: 1,
+      mimeType: 'image/jpeg',
     });
 
     if (!response || response.status !== 200) {
