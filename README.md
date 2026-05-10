@@ -35,6 +35,7 @@
 
 ## ✨ Features
 
+- 🎨 **Dark Luxury UI** — Stunning premium aesthetic with custom fonts, animations, and electric teal/amber accents
 - 📷 **Camera & Gallery** — Capture live photos or pick from your photo library
 - 🧠 **Scene Classification** — Identifies scene types from images
 - 🎭 **Mood Mapping** — 6 mood profiles: Calm, Tense, Warm, Mysterious, Energetic, Joyful
@@ -77,6 +78,9 @@ PhotoMusic/
 ├── assets/                          # App icons and splash images
 │
 └── src/
+    ├── components/
+    │   └── ui/                      # Reusable UI components (Buttons, Cards, Badges)
+    │
     ├── hooks/
     │   └── useTFSetup.ts            # Engine initialization hook
     │
@@ -96,8 +100,11 @@ PhotoMusic/
     │   ├── MagentaService.ts        # Algorithmic music generation
     │   └── ModelDownloadManager.ts  # Download & cache ML model files
     │
-    └── store/
+    ├── store/
         └── useAppStore.ts           # Zustand global state store
+    │
+    └── theme/
+        └── theme.ts                 # Design tokens (colors, fonts, spacing)
 ```
 
 ---
@@ -156,7 +163,6 @@ XOLO maps visual scene labels to musical parameters:
 - [ ] **MIDI Export** — Export generated sequences as MIDI files
 - [ ] **Custom Moods** — Let users create and save custom mood-to-music mappings
 - [ ] **Social Sharing** — Share generated tracks to social media
-- [ ] **Dark Mode** — Full dark theme support
 
 ---
 
