@@ -2,176 +2,101 @@
   <h1 align="center">XOLO</h1>
   <p align="center"><strong>AI-Powered Photo → Music Generator</strong></p>
   <p align="center">
-    <em>Snap a photo. Detect the mood. Generate music.</em>
+    <em>Snap a photo. Detect the vibe. Perform your melody.</em>
   </p>
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/React_Native-0.81.5-61DAFB?style=flat-square&logo=react" />
-  <img src="https://img.shields.io/badge/Expo-SDK_54-000020?style=flat-square&logo=expo" />
-  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript" />
-  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
-</p>
+---
+
+## 🌟 Overview
+
+**XOLO** is a multimodal AI mobile application that translates the visual atmosphere of a photograph into a unique musical composition. Using the power of OpenAI's **CLIP** model hosted locally on your laptop, XOLO analyzes the emotional "DNA" of a scene and generates a custom Smart Instrument that allows anyone to perform professional-sounding music, regardless of their training.
 
 ---
 
-## 📖 Overview
+## ✨ Key Features
 
-**XOLO** is a React Native mobile app that transforms photographs into original music. Point your camera at any scene — a beach, a city street, a cozy room — and XOLO will analyze the visual content, determine a mood, and algorithmically generate a unique musical piece tailored to that mood.
-
-### How It Works
-
-```
-📷 Capture Photo → 🧠 Scene Analysis → 🎭 Mood Mapping → 🎵 Music Generation → 🔊 Playback
-```
-
-1. **Capture** — Take a photo or pick one from your gallery
-2. **Analyze** — AI classifies the scene into categories (nature, urban, indoor, etc.)
-3. **Map** — Classification labels are mapped to musical parameters (tempo, scale, key, instruments)
-4. **Generate** — An algorithmic engine creates a note sequence based on those parameters
-5. **Play & Save** — Listen to the result and save it to your library
+- 📸 **Visual Vibe Analysis** — Capture a scene or upload from your gallery.
+- 🧠 **Local AI Brain** — Hosted Python server using CLIP for deep, zero-shot multimodal reasoning.
+- 🎼 **Smart Mapping** — Re-tunes 12 interactive pads to musical scales (Major, Minor, Pentatonic, Phrygian, etc.) that match the photo's mood.
+- 🎹 **Performance Grid** — A glowing 12-key instrument designed for high-fidelity musical expression.
+- 🤖 **Auto-Jam Mode** — Let the AI perform a beautiful, never-ending melody based on the detected mood.
+- 🎨 **Dark Luxury UI** — A premium aesthetic featuring dynamic gradients and custom typography (Syne & DM Sans).
 
 ---
 
-## ✨ Features
+## 🏗️ Technical Architecture
 
-- 🎨 **Dark Luxury UI** — Stunning premium aesthetic with custom fonts, animations, and electric teal/amber accents
-- 📷 **Camera & Gallery** — Capture live photos or pick from your photo library
-- 🧠 **Scene Classification** — Identifies scene types from images
-- 🎭 **Mood Mapping** — 6 mood profiles: Calm, Tense, Warm, Mysterious, Energetic, Joyful
-- 🎵 **Algorithmic Music Generation** — Creates unique note sequences using music theory (scales, keys, tempo)
-- 🔊 **Audio Playback** — Listen to generated tracks with expo-av
-- 💾 **Save & History** — Persist results to device storage and review past analyses
-- 📦 **Model Download Manager** — Downloads and caches ML assets on first launch
-- ⚡ **Splash Screen** — Progress-tracked asset download on first run
+### 1. The Mobile App (React Native / Expo)
+The "Player" that handles user interaction, camera capture, and real-time audio performance.
+- **Navigation:** React Navigation 7 (Native Stack)
+- **State:** Zustand (Session & Global Config)
+- **Audio:** Expo-AV (High-quality sampled instrument playback)
+- **Networking:** Local binary uploads to the Python Brain.
 
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| **Framework** | React Native 0.81 + Expo SDK 54 |
-| **Language** | TypeScript 5.9 |
-| **Navigation** | React Navigation 7 (Native Stack) |
-| **State Management** | Zustand 5 |
-| **Camera** | expo-camera (CameraView API) |
-| **Image Picker** | expo-image-picker |
-| **Audio** | expo-av |
-| **File System** | expo-file-system |
-| **Storage** | @react-native-async-storage/async-storage |
-| **Media Library** | expo-media-library |
-
----
-
-## 📁 Project Structure
-
-```
-PhotoMusic/
-├── App.tsx                          # Root component with navigation setup
-├── index.ts                         # Entry point (registerRootComponent)
-├── app.json                         # Expo configuration
-├── metro.config.js                  # Metro bundler config
-├── package.json
-├── tsconfig.json
-│
-├── assets/                          # App icons and splash images
-│
-└── src/
-    ├── components/
-    │   └── ui/                      # Reusable UI components (Buttons, Cards, Badges)
-    │
-    ├── hooks/
-    │   └── useTFSetup.ts            # Engine initialization hook
-    │
-    ├── navigation/
-    │   └── types.ts                 # RootStackParamList type definitions
-    │
-    ├── screens/
-    │   ├── SplashDownloadScreen.tsx  # First-run model download with progress bar
-    │   ├── HomeScreen.tsx            # Main menu (Camera / Gallery / History)
-    │   ├── CameraScreen.tsx         # Camera capture & gallery picker
-    │   ├── ResultScreen.tsx         # Analysis results, music gen, playback
-    │   └── HistoryScreen.tsx        # Past analysis history with playback
-    │
-    ├── services/
-    │   ├── TFLiteService.ts         # Image classification service
-    │   ├── MoodMapper.ts            # Label → musical parameter mapping
-    │   ├── MagentaService.ts        # Algorithmic music generation
-    │   └── ModelDownloadManager.ts  # Download & cache ML model files
-    │
-    ├── store/
-        └── useAppStore.ts           # Zustand global state store
-    │
-    └── theme/
-        └── theme.ts                 # Design tokens (colors, fonts, spacing)
-```
+### 2. The AI Brain (Python / FastAPI)
+The "Processor" that runs on your laptop to handle heavy AI inference.
+- **Model:** OpenAI CLIP (`clip-vit-base-patch32`)
+- **Backend:** FastAPI with Uvicorn (Host: `0.0.0.0`)
+- **Intelligence:** Maps visual embeddings to 6 musical archetypes (*Lofi, Cyberpunk, Zen, Ethereal, Dark Gothic, Tropical*).
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Step 1: Set up the AI Brain (Laptop)
+Ensure you have **Python 3.10+** installed.
 
-- **Node.js** ≥ 18
-- **npm** or **yarn**
-- **Expo Go** app on your Android/iOS device
-- **Expo CLI** (`npx expo`)
+1. **Install Dependencies:**
+   ```bash
+   pip install torch torchvision transformers fastapi uvicorn pillow python-multipart
+   ```
+2. **Run the Server:**
+   ```bash
+   python xolo_server.py
+   ```
+   *Note: On the first run, the CLIP model (~600MB) will be downloaded automatically.*
 
-### Installation
+### Step 2: Set up the Mobile App (Phone)
+1. **Find your Laptop's IP Address:**
+   - Windows: `ipconfig` (IPv4 Address)
+   - Mac/Linux: `ifconfig` or check Network Settings.
+2. **Launch XOLO:**
+   - Run `npx expo start` and open it on your device.
+3. **Configure Connection:**
+   - On the **Home Screen**, enter your laptop's IP in the **"AI BRAIN IP"** box.
+   - Ensure both devices are on the **same Wi-Fi network**.
 
-```bash
-# Clone the repository
-git clone https://github.com/Ayussh-007/XOLO.git
-cd XOLO
+---
 
-# Install dependencies
-npm install
+## 📂 Project Structure
 
-# Start the development server
-npx expo start -c
+```text
+XOLO/
+├── src/
+│   ├── api/          # Network services (Brain API)
+│   ├── components/   # Reusable UI (Buttons, Waveforms, etc.)
+│   ├── hooks/        # Reactive logic (Theme, Brain Setup)
+│   ├── navigation/   # Root Navigator & Type definitions
+│   ├── screens/      # Feature-based screen modules
+│   ├── store/        # Zustand global stores
+│   └── theme/        # Design system & color tokens
+├── xolo_server.py    # Python AI Brain (Laptop side)
+├── App.tsx           # Entry point
+└── README.md         # Documentation
 ```
 
-### Running on Device
-
-1. Install **Expo Go** from the [Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent) or [App Store](https://apps.apple.com/app/expo-go/id982107779)
-2. Scan the QR code shown in the terminal
-3. The app will download required assets on first launch
-
 ---
 
-## 🎭 Mood Mapping System
+## 💡 How it Works (The Math)
 
-XOLO maps visual scene labels to musical parameters:
-
-| Scene Keywords | Mood | Tempo | Scale | Key | Instruments |
-|---|---|---|---|---|---|
-| beach, ocean, mountain, forest | **Calm** | 70 BPM | Major | C | Piano, Strings |
-| street, building, traffic, car | **Tense** | 110 BPM | Minor | Am | Synth, Bass |
-| bedroom, kitchen, library, room | **Warm** | 80 BPM | Major | G | Guitar, Piano |
-| night, dark, shadow, moon | **Mysterious** | 85 BPM | Phrygian | Em | Pad, Bells |
-| sport, gym, crowd, stadium | **Energetic** | 140 BPM | Minor | Dm | Drums, Synth |
-| flower, park, garden, butterfly | **Joyful** | 120 BPM | Major | F | Marimba, Flute |
-
----
-
-## 🗺️ Roadmap
-
-- [ ] **Real ML Inference** — Integrate `react-native-fast-tflite` for on-device MobileNet classification
-- [ ] **Audio Synthesis** — Generate actual WAV/MP3 output using a native audio bridge
-- [ ] **Cloud Vision API** — Optional Google Cloud Vision integration for better accuracy
-- [ ] **MIDI Export** — Export generated sequences as MIDI files
-- [ ] **Custom Moods** — Let users create and save custom mood-to-music mappings
-- [ ] **Social Sharing** — Share generated tracks to social media
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
+1. **Vision:** CLIP converts your image into a 512-dimensional vector.
+2. **Comparison:** It calculates the cosine similarity between your image vector and several pre-defined text mood vectors.
+3. **Synthesis:** The top match defines the **Musical DNA** (BPM, Scale, Key, and Instrument).
+4. **Logic:** The mobile app maps these parameters to the performance grid, ensuring zero dissonant notes.
 
 ---
 
 <p align="center">
-  Built with ❤️ by <a href="https://github.com/Ayussh-007">Ayussh-007</a>
+  Built with ❤️ for AI Musicians.
 </p>
