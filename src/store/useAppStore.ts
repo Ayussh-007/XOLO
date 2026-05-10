@@ -15,6 +15,13 @@ interface AppState {
   matches: MoodMatch[];
   selectedMatch: MoodMatch | null;
 
+  // --- Music Generation ---
+  generatedAudio: Record<string, string>; // "moodId_instX" -> local file path
+  isGenerating: boolean;
+  generationProgress: string;
+  currentInstrumentIndex: number;
+  useFallback: boolean; // true when HuggingFace is unreachable
+
   // --- Actions ---
   setImageUri: (uri: string | null) => void;
   setServerIp: (ip: string) => void;
@@ -22,6 +29,11 @@ interface AppState {
   setSelectedMatch: (match: MoodMatch | null) => void;
   setIsAnalysing: (loading: boolean) => void;
   setStatus: (status: string) => void;
+  setGeneratedAudio: (key: string, filePath: string) => void;
+  setIsGenerating: (val: boolean) => void;
+  setGenerationProgress: (msg: string) => void;
+  setCurrentInstrumentIndex: (index: number) => void;
+  setUseFallback: (val: boolean) => void;
   resetSession: () => void;
   purgeLegacyData: () => Promise<void>;
 }
@@ -32,6 +44,11 @@ const initialSessionState = {
   isAnalysing: false,
   matches: [],
   selectedMatch: null,
+  generatedAudio: {},
+  isGenerating: false,
+  generationProgress: '',
+  currentInstrumentIndex: 0,
+  useFallback: false,
 };
 
 export const useAppStore = create<AppState>((set) => ({
@@ -46,7 +63,15 @@ export const useAppStore = create<AppState>((set) => ({
   setSelectedMatch: (match) => set({ selectedMatch: match }),
   setIsAnalysing: (loading) => set({ isAnalysing: loading }),
   setStatus: (status) => set({ status }),
-  
+  setGeneratedAudio: (key, filePath) =>
+    set((state) => ({
+      generatedAudio: { ...state.generatedAudio, [key]: filePath },
+    })),
+  setIsGenerating: (val) => set({ isGenerating: val }),
+  setGenerationProgress: (msg) => set({ generationProgress: msg }),
+  setCurrentInstrumentIndex: (index) => set({ currentInstrumentIndex: index }),
+  setUseFallback: (val) => set({ useFallback: val }),
+
   resetSession: () => set(initialSessionState),
 
   // CRITICAL: Clears any corrupted old data from the phone's storage

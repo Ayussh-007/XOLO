@@ -7,6 +7,7 @@ export type RootStackParamList = {
   Camera: { mode: 'camera' | 'gallery' };
   Result: { imageUri: string };
   MoodSelection: { imageUri: string };
+  Generating: undefined;
   Performance: undefined;
   History: undefined;
 };

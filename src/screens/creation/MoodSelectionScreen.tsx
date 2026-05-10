@@ -26,7 +26,7 @@ const MoodSelectionScreen: React.FC<Props> = ({ navigation, route }) => {
   const handleSelect = (match: MoodMatch) => {
     if (match) {
       setSelectedMatch(match);
-      navigation.navigate('Performance');
+      navigation.navigate('Generating');
     }
   };
 

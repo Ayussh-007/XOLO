@@ -17,6 +17,7 @@ import HistoryScreen from '../screens/main/HistoryScreen';
 import CameraScreen from '../screens/creation/CameraScreen';
 import ResultScreen from '../screens/creation/ResultScreen';
 import MoodSelectionScreen from '../screens/creation/MoodSelectionScreen';
+import GeneratingScreen from '../screens/creation/GeneratingScreen';
 import PerformanceScreen from '../screens/creation/PerformanceScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -44,6 +45,7 @@ export const RootNavigator = () => {
       <Stack.Screen name="Camera" component={CameraScreen} />
       <Stack.Screen name="Result" component={ResultScreen} />
       <Stack.Screen name="MoodSelection" component={MoodSelectionScreen} />
+      <Stack.Screen name="Generating" component={GeneratingScreen} />
       <Stack.Screen name="Performance" component={PerformanceScreen} />
       <Stack.Screen name="History" component={HistoryScreen} />
     </Stack.Navigator>
