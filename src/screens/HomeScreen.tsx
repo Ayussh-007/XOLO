@@ -1,95 +1,278 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  StatusBar,
+  Animated,
+  Dimensions,
+  Pressable,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
+import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
+import { colors, fonts, spacing } from '../theme/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }: Props) {
+  // Animated floating blobs
+  const blob1X = useRef(new Animated.Value(0)).current;
+  const blob1Y = useRef(new Animated.Value(0)).current;
+  const blob2X = useRef(new Animated.Value(0)).current;
+  const blob2Y = useRef(new Animated.Value(0)).current;
+  const fadeIn = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Entrance
+    Animated.timing(fadeIn, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+
+    // Floating blob 1
+    Animated.loop(
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(blob1X, {
+            toValue: 30,
+            duration: 6000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blob1X, {
+            toValue: -20,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blob1X, {
+            toValue: 0,
+            duration: 4000,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(blob1Y, {
+            toValue: -25,
+            duration: 5500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blob1Y, {
+            toValue: 15,
+            duration: 4500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blob1Y, {
+            toValue: 0,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+        ]),
+      ])
+    ).start();
+
+    // Floating blob 2
+    Animated.loop(
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(blob2X, {
+            toValue: -25,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blob2X, {
+            toValue: 20,
+            duration: 6000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blob2X, {
+            toValue: 0,
+            duration: 4500,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(blob2Y, {
+            toValue: 20,
+            duration: 4500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blob2Y, {
+            toValue: -20,
+            duration: 5500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blob2Y, {
+            toValue: 0,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+        ]),
+      ])
+    ).start();
+  }, []);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>XOLO</Text>
-        <Text style={styles.subtitle}>Musical Instrument Analyzer</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={[styles.button, styles.primaryButton]} 
-            onPress={() => navigation.navigate('Camera', { mode: 'camera' })}
-          >
-            <Text style={styles.buttonText}>Take Photo</Text>
-          </TouchableOpacity>
+      {/* Animated gradient blobs */}
+      <Animated.View
+        style={[
+          styles.blobContainer,
+          {
+            transform: [{ translateX: blob1X }, { translateY: blob1Y }],
+          },
+        ]}
+      >
+        <LinearGradient
+          colors={[colors.accentTeal, 'transparent']}
+          style={styles.blob1}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        />
+      </Animated.View>
 
-          <TouchableOpacity 
-            style={[styles.button, styles.secondaryButton]} 
-            onPress={() => navigation.navigate('Camera', { mode: 'gallery' })}
-          >
-            <Text style={styles.buttonText}>Pick from Gallery</Text>
-          </TouchableOpacity>
+      <Animated.View
+        style={[
+          styles.blobContainer2,
+          {
+            transform: [{ translateX: blob2X }, { translateY: blob2Y }],
+          },
+        ]}
+      >
+        <LinearGradient
+          colors={[colors.accentAmber, 'transparent']}
+          style={styles.blob2}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        />
+      </Animated.View>
 
-          <TouchableOpacity 
-            style={styles.historyButton} 
+      <SafeAreaView style={styles.safeArea}>
+        <Animated.View style={[styles.content, { opacity: fadeIn }]}>
+          {/* Small logo */}
+          <View style={styles.logoRow}>
+            <Ionicons name="camera" size={18} color={colors.accentTeal} />
+            <MaterialCommunityIcons
+              name="waveform"
+              size={20}
+              color={colors.accentTeal}
+              style={{ marginLeft: 2 }}
+            />
+          </View>
+
+          {/* Headline */}
+          <Text style={styles.headline}>
+            What does{'\n'}it sound like?
+          </Text>
+
+          {/* Buttons */}
+          <View style={styles.buttonGroup}>
+            <PrimaryButton
+              label="Take a Photo"
+              onPress={() => navigation.navigate('Camera', { mode: 'camera' })}
+              shimmer
+              icon={
+                <Ionicons name="camera" size={20} color={colors.black} />
+              }
+            />
+
+            <SecondaryButton
+              label="From Gallery"
+              onPress={() => navigation.navigate('Camera', { mode: 'gallery' })}
+              icon={
+                <Ionicons name="images" size={18} color={colors.accentTeal} />
+              }
+              style={{ marginTop: spacing.base }}
+            />
+          </View>
+
+          {/* History link */}
+          <Pressable
             onPress={() => navigation.navigate('History')}
+            style={styles.historyLink}
           >
-            <Text style={styles.historyButtonText}>View History</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </SafeAreaView>
+            <Ionicons
+              name="time-outline"
+              size={16}
+              color={colors.textSecondary}
+              style={{ marginRight: spacing.xs }}
+            />
+            <Text style={styles.historyText}>History</Text>
+          </Pressable>
+        </Animated.View>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   content: {
     flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+  },
+  blobContainer: {
+    position: 'absolute',
+    top: -80,
+    left: -60,
+  },
+  blob1: {
+    width: width * 0.8,
+    height: width * 0.8,
+    borderRadius: width * 0.4,
+    opacity: 0.12,
+  },
+  blobContainer2: {
+    position: 'absolute',
+    top: 40,
+    right: -100,
+  },
+  blob2: {
+    width: width * 0.6,
+    height: width * 0.6,
+    borderRadius: width * 0.3,
+    opacity: 0.1,
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  headline: {
+    fontFamily: fonts.displayBold,
+    fontSize: 38,
+    color: colors.textPrimary,
+    lineHeight: 48,
+    letterSpacing: -0.5,
+    marginBottom: spacing.xxl,
+  },
+  buttonGroup: {
+    width: '100%',
+  },
+  historyLink: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    marginTop: spacing.xxl,
+    paddingVertical: spacing.sm,
   },
-  title: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    letterSpacing: 8,
-    color: '#000',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 50,
-  },
-  buttonContainer: {
-    width: '100%',
-    gap: 15,
-  },
-  button: {
-    padding: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-    width: '100%',
-  },
-  primaryButton: {
-    backgroundColor: '#007AFF',
-  },
-  secondaryButton: {
-    backgroundColor: '#34C759',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  historyButton: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  historyButtonText: {
-    color: '#007AFF',
-    fontSize: 16,
+  historyText: {
+    fontFamily: fonts.bodyRegular,
+    fontSize: 14,
+    color: colors.textSecondary,
+    letterSpacing: 0.3,
   },
 });
