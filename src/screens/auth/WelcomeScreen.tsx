@@ -79,14 +79,8 @@ export default function WelcomeScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.bottomSection}>
-        <Pressable style={[styles.primaryButton, { backgroundColor: activeColors.accentTeal }]} onPress={() => navigation.navigate('Signup')}>
-          <Text style={styles.primaryButtonText}>Sign Up</Text>
-        </Pressable>
-        <Pressable style={[styles.secondaryButton, { backgroundColor: activeColors.surfaceElevated, borderColor: activeColors.borderSubtle }]} onPress={() => navigation.navigate('Login')}>
-          <Text style={[styles.secondaryButtonText, { color: activeColors.textPrimary }]}>Log In</Text>
-        </Pressable>
-        <Pressable style={styles.skipButton} onPress={() => navigation.replace('Home')}>
-          <Text style={[styles.skipText, { color: activeColors.textMuted }]}>Continue as Guest</Text>
+        <Pressable style={[styles.primaryButton, { backgroundColor: activeColors.accentTeal }]} onPress={() => navigation.replace('Home')}>
+          <Text style={styles.primaryButtonText}>Get Started</Text>
         </Pressable>
       </View>
     </View>
