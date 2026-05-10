@@ -1,53 +1,65 @@
 import { create } from 'zustand';
-
-interface MoodParams {
-  tempo: number;
-  scale: string;
-  key: string;
-  instruments: string[];
-}
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MoodMatch } from '../api/brainApi';
 
 interface AppState {
-  // State
-  imageUri: string | null;
-  moodLabel: string | null;
-  moodParams: MoodParams | null;
-  audioPath: string | null;
-  isAnalysing: boolean;
-  isGenerating: boolean;
-  status: string;
+  // --- Persistent Configuration ---
+  serverIp: string;
 
-  // Actions
+  // --- Session State ---
+  imageUri: string | null;
+  status: string;
+  isAnalysing: boolean;
+  
+  // --- AI Results ---
+  matches: MoodMatch[];
+  selectedMatch: MoodMatch | null;
+
+  // --- Actions ---
   setImageUri: (uri: string | null) => void;
-  setMoodLabel: (label: string | null) => void;
-  setMoodParams: (params: MoodParams | null) => void;
-  setAudioPath: (path: string | null) => void;
+  setServerIp: (ip: string) => void;
+  setMatches: (matches: MoodMatch[]) => void;
+  setSelectedMatch: (match: MoodMatch | null) => void;
   setIsAnalysing: (loading: boolean) => void;
-  setIsGenerating: (loading: boolean) => void;
   setStatus: (status: string) => void;
-  resetAll: () => void;
+  resetSession: () => void;
+  purgeLegacyData: () => Promise<void>;
 }
 
-const initialState = {
+const initialSessionState = {
   imageUri: null,
-  moodLabel: null,
-  moodParams: null,
-  audioPath: null,
-  isAnalysing: false,
-  isGenerating: false,
   status: 'Ready',
+  isAnalysing: false,
+  matches: [],
+  selectedMatch: null,
 };
 
 export const useAppStore = create<AppState>((set) => ({
-  ...initialState,
+  // Initial state
+  serverIp: '192.168.1.1',
+  ...initialSessionState,
 
+  // Setters
   setImageUri: (uri) => set({ imageUri: uri }),
-  setMoodLabel: (label) => set({ moodLabel: label }),
-  setMoodParams: (params) => set({ moodParams: params }),
-  setAudioPath: (path) => set({ audioPath: path }),
+  setServerIp: (ip) => set({ serverIp: ip }),
+  setMatches: (matches) => set({ matches: matches || [] }),
+  setSelectedMatch: (match) => set({ selectedMatch: match }),
   setIsAnalysing: (loading) => set({ isAnalysing: loading }),
-  setIsGenerating: (loading) => set({ isGenerating: loading }),
-  setStatus: (status) => set({ status: status }),
+  setStatus: (status) => set({ status }),
   
-  resetAll: () => set(initialState),
+  resetSession: () => set(initialSessionState),
+
+  // CRITICAL: Clears any corrupted old data from the phone's storage
+  purgeLegacyData: async () => {
+    try {
+      console.log('🧹 Purging legacy app data...');
+      const keys = await AsyncStorage.getAllKeys();
+      // Keep history but clear everything else that might be corrupted
+      const keysToRemove = keys.filter(k => k !== 'photomusic_history');
+      await AsyncStorage.multiRemove(keysToRemove);
+      set({ ...initialSessionState });
+    } catch (e) {
+      console.error('Failed to purge data');
+    }
+  }
 }));

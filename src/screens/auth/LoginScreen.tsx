@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { RootStackParamList } from '../navigation/types';
-import { useThemeColors } from '../hooks/useThemeColors';
-import { fonts, spacing, radius } from '../theme/theme';
+import { RootStackParamList } from '../../navigation/types';
+import { useThemeColors } from '../../hooks/useThemeColors';
+import { fonts, spacing, radius } from '../../theme/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -22,7 +22,6 @@ export default function LoginScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // Placeholder login logic
     navigation.replace('Splash');
   };
 
@@ -42,21 +41,12 @@ export default function LoginScreen({ navigation }: Props) {
 
       <View style={styles.content}>
         <Text style={[styles.title, { color: colors.textPrimary }]}>Welcome back</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Log in to continue your journey.
-        </Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Log in to continue your journey.</Text>
 
         <View style={styles.inputContainer}>
           <Text style={[styles.label, { color: colors.textMuted }]}>Email</Text>
           <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                borderColor: colors.borderSubtle,
-                color: colors.textPrimary,
-              },
-            ]}
+            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.borderSubtle, color: colors.textPrimary }]}
             placeholder="Enter your email"
             placeholderTextColor={colors.textMuted}
             value={email}
@@ -69,14 +59,7 @@ export default function LoginScreen({ navigation }: Props) {
         <View style={styles.inputContainer}>
           <Text style={[styles.label, { color: colors.textMuted }]}>Password</Text>
           <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                borderColor: colors.borderSubtle,
-                color: colors.textPrimary,
-              },
-            ]}
+            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.borderSubtle, color: colors.textPrimary }]}
             placeholder="Enter your password"
             placeholderTextColor={colors.textMuted}
             value={password}
@@ -85,10 +68,7 @@ export default function LoginScreen({ navigation }: Props) {
           />
         </View>
 
-        <Pressable
-          style={[styles.loginButton, { backgroundColor: colors.accentTeal }]}
-          onPress={handleLogin}
-        >
+        <Pressable style={[styles.loginButton, { backgroundColor: colors.accentTeal }]} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Log In</Text>
         </Pressable>
       </View>
@@ -97,64 +77,15 @@ export default function LoginScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: 60,
-    paddingBottom: spacing.base,
-  },
-  backButton: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    justifyContent: 'center',
-  },
-  title: {
-    fontFamily: fonts.displayBold,
-    fontSize: 32,
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    fontFamily: fonts.bodyRegular,
-    fontSize: 16,
-    marginBottom: spacing.xl,
-  },
-  inputContainer: {
-    marginBottom: spacing.lg,
-  },
-  label: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 14,
-    marginBottom: spacing.sm,
-    marginLeft: spacing.sm,
-  },
-  input: {
-    fontFamily: fonts.bodyRegular,
-    fontSize: 16,
-    height: 56,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    paddingHorizontal: spacing.base,
-  },
-  loginButton: {
-    height: 56,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.lg,
-  },
-  loginButtonText: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 16,
-    color: '#080C14',
-  },
+  container: { flex: 1 },
+  header: { paddingHorizontal: spacing.lg, paddingTop: 60, paddingBottom: spacing.base },
+  backButton: { width: 48, height: 48, borderRadius: radius.full, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  content: { flex: 1, paddingHorizontal: spacing.lg, justifyContent: 'center' },
+  title: { fontFamily: fonts.displayBold, fontSize: 32, marginBottom: spacing.xs },
+  subtitle: { fontFamily: fonts.bodyRegular, fontSize: 16, marginBottom: spacing.xl },
+  inputContainer: { marginBottom: spacing.lg },
+  label: { fontFamily: fonts.bodyMedium, fontSize: 14, marginBottom: spacing.sm, marginLeft: spacing.sm },
+  input: { fontFamily: fonts.bodyRegular, fontSize: 16, height: 56, borderRadius: radius.md, borderWidth: 1, paddingHorizontal: spacing.base },
+  loginButton: { height: 56, borderRadius: radius.full, alignItems: 'center', justifyContent: 'center', marginTop: spacing.lg },
+  loginButtonText: { fontFamily: fonts.bodyMedium, fontSize: 16, color: '#080C14' },
 });
